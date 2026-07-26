@@ -57,14 +57,30 @@ function responsJson(data,status=200,headers={}){
   return new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...headers}});
 }
 
+function normalisasiAsal(nilai){
+  return String(nilai||'').trim().replace(/\/$/,'').toLowerCase();
+}
+
 function asalDiizinkan(request){
-  const origin=request.headers.get('origin');
+  const origin=normalisasiAsal(request.headers.get('origin'));
   if(!origin)return true;
-  const kandidat=[process.env.URL,process.env.DEPLOY_PRIME_URL,...String(process.env.ALLOWED_ORIGINS||'').split(',')]
-    .map(x=>String(x||'').trim().replace(/\/$/,''))
-    .filter(Boolean);
-  if(process.env.CONTEXT==='dev')kandidat.push('http://localhost:8888','http://127.0.0.1:8888');
-  return kandidat.includes(origin.replace(/\/$/,''));
+
+  let asalPermintaan='';
+  try{
+    asalPermintaan=normalisasiAsal(new URL(request.url).origin);
+  }catch(error){}
+
+  const kandidat=[
+    asalPermintaan,
+    process.env.URL,
+    ...String(process.env.ALLOWED_ORIGINS||'').split(',')
+  ].map(normalisasiAsal).filter(Boolean);
+
+  if(process.env.CONTEXT==='dev'){
+    kandidat.push('http://localhost:8888','http://127.0.0.1:8888');
+  }
+
+  return kandidat.includes(origin);
 }
 
 export default async function handler(request,context){
