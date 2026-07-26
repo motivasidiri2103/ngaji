@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#087f5b">
+  <meta name="description" content="Pantau kehadiran, setoran, dan perkembangan santri dalam satu sistem.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Monitoring Mengaji">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <link rel="stylesheet" href="/assets/app.css">
+  <title>Aplikasi Monitoring Mengaji</title>
+</head>
+<body>
+  <div id="status-jaringan" class="status-jaringan" role="status" aria-live="polite"></div>
+  <div id="update-banner" class="update-banner" role="status">Versi baru tersedia.<button type="button" onclick="terapkanPembaruan()">Muat ulang</button></div>
+  <div id="aplikasi-root" data-versi="2.0.0">
+<div id="layar-memuat" class="layar-memuat aktif" aria-live="polite">
+  <div class="loader-logo">م</div>
+  <div class="spinner"></div>
+  <strong>Menyiapkan aplikasi…</strong>
+</div>
+
+<div id="shell-aplikasi" class="shell tersembunyi">
+  <aside id="sidebar" class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">م</div>
+      <div><strong id="brand-nama">Monitoring Mengaji</strong><small id="brand-lembaga">Lembaga Al-Qur'an</small></div>
+    </div>
+    <nav class="nav-sidebar" aria-label="Navigasi utama">
+      <button data-halaman="dashboard" class="nav-item aktif"><span>⌂</span><b>Dashboard</b></button>
+      <button data-halaman="kehadiran" class="nav-item"><span>✓</span><b>Kehadiran</b></button>
+      <button data-halaman="setoran" class="nav-item"><span>▤</span><b>Setoran Mengaji</b></button>
+      <button data-halaman="santri" class="nav-item"><span>♙</span><b>Santri</b></button>
+      <button data-halaman="pengajar" class="nav-item"><span>♜</span><b>Pengajar</b></button>
+      <button data-halaman="wali" class="nav-item"><span>♧</span><b>Wali Santri</b></button>
+      <button data-halaman="kelas" class="nav-item"><span>▦</span><b>Kelas</b></button>
+      <button data-halaman="jadwal" class="nav-item"><span>◷</span><b>Jadwal</b></button>
+      <button data-halaman="materi" class="nav-item"><span>▣</span><b>Materi</b></button>
+      <button data-halaman="target" class="nav-item"><span>◎</span><b>Target</b></button>
+      <button data-halaman="catatan" class="nav-item"><span>✎</span><b>Catatan</b></button>
+      <button data-halaman="laporan" class="nav-item"><span>▥</span><b>Laporan</b></button>
+      <button data-halaman="pengumuman" class="nav-item"><span>◉</span><b>Pengumuman</b></button>
+      <button data-halaman="pengguna" class="nav-item khusus-admin"><span>⚿</span><b>Pengguna</b></button>
+      <button data-halaman="pengaturan" class="nav-item"><span>⚙</span><b>Pengaturan</b></button>
+      <button data-halaman="audit" class="nav-item khusus-pengelola"><span>⌕</span><b>Audit Log</b></button>
+      <button data-halaman="backup" class="nav-item khusus-pengelola"><span>⇩</span><b>Backup</b></button>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="nav-item bahaya" onclick="keluarAplikasi()"><span>↪</span><b>Keluar</b></button>
+      <small>Versi <span id="versi-aplikasi"></span></small>
+    </div>
+  </aside>
+
+  <main class="area-utama">
+    <header class="topbar">
+      <div class="topbar-kiri">
+        <button id="tombol-collapse-sidebar" class="ikon-button desktop-sidebar-toggle" type="button" onclick="toggleSidebar()" title="Ciutkan atau lebarkan sidebar" aria-label="Ciutkan atau lebarkan sidebar">☰</button>
+        <button class="ikon-button mobile-only" type="button" onclick="toggleSidebarMobile()" title="Buka menu" aria-label="Buka menu">☰</button>
+        <div><h1 id="judul-halaman">Dashboard</h1><p id="subjudul-halaman">Ringkasan kegiatan hari ini</p></div>
+      </div>
+      <div class="topbar-kanan">
+        <button class="ikon-button" onclick="muatHalamanAktif()" title="Muat ulang">↻</button>
+        <div class="profil-mini"><div id="avatar-pengguna" class="avatar">A</div><div><strong id="nama-pengguna">Pengguna</strong><small id="peran-pengguna">Peran</small></div></div>
+      </div>
+    </header>
+    <div id="konten-halaman" class="konten-halaman"></div>
+  </main>
+
+  <nav class="bottom-nav" aria-label="Navigasi mobile">
+    <button data-halaman="dashboard" class="aktif"><span>⌂</span><small>Beranda</small></button>
+    <button data-halaman="kehadiran"><span>✓</span><small>Hadir</small></button>
+    <button data-halaman="setoran"><span>▤</span><small>Setoran</small></button>
+    <button data-halaman="santri"><span>♙</span><small>Santri</small></button>
+    <button data-halaman="lainnya"><span>•••</span><small>Lainnya</small></button>
+  </nav>
+</div>
+
+<div id="drawer-lainnya" class="drawer">
+  <div class="drawer-panel">
+    <div class="drawer-header"><strong>Menu Lainnya</strong><button class="ikon-button" onclick="tutupDrawer()">×</button></div>
+    <div class="grid-menu-lainnya">
+      <button class="khusus-admin-pengelola" onclick="navigasiKe('pengajar')">♜<span>Pengajar</span></button><button class="khusus-admin-pengelola" onclick="navigasiKe('wali')">♧<span>Wali</span></button>
+      <button onclick="navigasiKe('kelas')">▦<span>Kelas</span></button><button onclick="navigasiKe('jadwal')">◷<span>Jadwal</span></button>
+      <button onclick="navigasiKe('materi')">▣<span>Materi</span></button><button onclick="navigasiKe('target')">◎<span>Target</span></button>
+      <button onclick="navigasiKe('catatan')">✎<span>Catatan</span></button><button onclick="navigasiKe('laporan')">▥<span>Laporan</span></button>
+      <button onclick="navigasiKe('pengaturan')">⚙<span>Pengaturan</span></button><button onclick="keluarAplikasi()">↪<span>Keluar</span></button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-global" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-panel">
+    <div class="modal-header"><div><h3 id="modal-judul">Form</h3><p id="modal-subjudul"></p></div><button class="ikon-button" onclick="tutupModal()">×</button></div>
+    <form id="modal-form" class="modal-body"></form>
+    <div class="modal-footer"><button type="button" class="btn sekunder" onclick="tutupModal()">Batal</button><button type="submit" form="modal-form" class="btn utama" id="modal-simpan">Simpan</button></div>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<section id="halaman-login" class="halaman-login">
+  <div class="login-dekorasi"><div class="ornamen">﷽</div><h2>Belajar, Bertumbuh, dan Terpantau</h2><p>Satu ruang digital untuk mencatat kehadiran, setoran, target, dan perkembangan santri.</p><div class="fitur-login"><span>✓ Mobile-first</span><span>✓ Laporan terstruktur</span><span>✓ Data terpusat</span></div></div>
+  <div class="login-panel">
+    <div class="login-card">
+      <div class="login-logo">م</div><h1>Selamat Datang</h1><p>Masuk ke Aplikasi Monitoring Mengaji</p>
+      <form id="form-login" onsubmit="prosesLogin(event)">
+        <label>Nama Pengguna<input name="nama_pengguna" autocomplete="username" required placeholder="Masukkan nama pengguna"></label>
+        <label>Password<div class="input-password"><input id="input-password" name="password" type="password" autocomplete="current-password" required placeholder="Masukkan password"><button type="button" onclick="togglePassword()">◉</button></div></label>
+        <button class="btn utama lebar" type="submit">Masuk ke Aplikasi</button>
+      </form>
+      <small class="login-note">Gunakan akun yang dibuat oleh pengelola lembaga.</small>
+    </div>
+  </div>
+</section>
+
+<template id="tpl-dashboard"><section class="page" data-page="dashboard"><div id="dashboard-salam" class="hero-ringkas"></div><div id="dashboard-statistik" class="stat-grid"></div><div class="grid-dua"><div class="card"><div class="card-header"><div><h3>Grafik Kehadiran 7 Hari</h3><p>Jumlah santri hadir dibanding total pencatatan</p></div></div><div id="grafik-kehadiran" class="grafik-bar"></div></div><div class="card"><div class="card-header"><div><h3>Perkembangan Nilai</h3><p>Rata-rata nilai setoran harian</p></div></div><div id="grafik-nilai" class="grafik-bar"></div></div></div><div class="grid-dua"><div class="card"><div class="card-header"><h3>Jadwal Hari Ini</h3></div><div id="jadwal-hari-ini" class="list-modern"></div></div><div class="card"><div class="card-header"><h3>Santri Perlu Perhatian</h3></div><div id="santri-perhatian" class="list-modern"></div></div></div><div class="card"><div class="card-header"><h3>Aktivitas Terbaru</h3></div><div id="aktivitas-terbaru" class="table-wrap"></div></div></section></template>
+
+<template id="tpl-santri"><section class="page" data-page="santri"><div class="toolbar"><div class="search-box"><span>⌕</span><input id="cari-santri" placeholder="Cari nama atau nomor induk" oninput="debounceMuatSantri()"></div><select id="filter-status-santri" onchange="muatSantri()"><option value="">Semua status</option><option>AKTIF</option><option>CUTI</option><option>LULUS</option><option>KELUAR</option><option>PINDAH</option></select><button class="btn utama khusus-admin-pengelola" onclick="formTambahSantri()">+ Tambah Santri</button></div><div class="card"><div id="tabel-santri" class="table-wrap"></div><div id="paginasi-santri" class="paginasi"></div></div></section></template>
+
+<template id="tpl-pengajar"><section class="page" data-page="pengajar"><div class="toolbar"><div class="search-box"><span>⌕</span><input id="cari-pengajar" placeholder="Cari pengajar" oninput="debounceMuatPengajar()"></div><button class="btn utama khusus-admin-pengelola" onclick="formTambahPengajar()">+ Tambah Pengajar</button></div><div class="card"><div id="tabel-pengajar" class="table-wrap"></div></div></section></template>
+
+<template id="tpl-wali"><section class="page" data-page="wali"><div class="toolbar"><div class="search-box"><span>⌕</span><input id="cari-wali" placeholder="Cari wali atau nomor WhatsApp" oninput="debounceMuatWali()"></div><button class="btn utama khusus-admin-pengelola" onclick="formTambahWali()">+ Tambah Wali</button></div><div class="card"><div id="tabel-wali" class="table-wrap"></div></div></section></template>
+
+<template id="tpl-kelas"><section class="page" data-page="kelas"><div class="toolbar"><div class="search-box"><span>⌕</span><input id="cari-kelas" placeholder="Cari kelas" oninput="debounceMuatKelas()"></div><button class="btn utama khusus-admin-pengelola" onclick="formTambahKelas()">+ Tambah Kelas</button></div><div id="grid-kelas" class="grid-kartu"></div></section></template>
+
+<template id="tpl-jadwal"><section class="page" data-page="jadwal"><div class="toolbar"><select id="filter-hari-jadwal" onchange="muatJadwal()"><option value="">Semua hari</option><option>Senin</option><option>Selasa</option><option>Rabu</option><option>Kamis</option><option>Jumat</option><option>Sabtu</option><option>Minggu</option></select><button class="btn utama khusus-admin-pengelola" onclick="formTambahJadwal()">+ Tambah Jadwal</button></div><div class="card"><div id="tabel-jadwal" class="table-wrap"></div></div></section></template>
+
+<template id="tpl-kehadiran"><section class="page" data-page="kehadiran"><div class="card filter-card"><div class="form-grid tiga"><label>Kelas<select id="kehadiran-kelas" onchange="muatFormKehadiran()"></select></label><label>Tanggal<input type="date" id="kehadiran-tanggal" onchange="muatFormKehadiran()"></label><div class="align-end"><button class="btn sekunder" onclick="tandaiSemuaHadir()">Tandai Semua Hadir</button></div></div></div><div class="card"><div class="card-header"><div><h3>Daftar Kehadiran</h3><p id="ringkasan-status-kehadiran">Pilih kelas dan tanggal</p></div><button class="btn utama" onclick="simpanKehadiran()">Simpan Kehadiran</button></div><div id="daftar-kehadiran" class="attendance-list"></div></div></section></template>
+
+<template id="tpl-materi"><section class="page" data-page="materi"><div class="toolbar"><div class="search-box"><span>⌕</span><input id="cari-materi" placeholder="Cari materi" oninput="debounceMuatMateri()"></div><button class="btn utama khusus-admin-pengelola" onclick="formTambahMateri()">+ Tambah Materi</button></div><div class="card"><div id="tabel-materi" class="table-wrap"></div></div></section></template>
+
+<template id="tpl-setoran"><section class="page" data-page="setoran"><div class="card"><div class="form-grid tiga"><label>Kelas<select id="setoran-kelas" onchange="muatSantriSetoran()"></select></label><label>Santri<select id="setoran-santri" onchange="muatRingkasanSetoran()"></select></label><div class="align-end"><button class="btn sekunder" onclick="muatRiwayatSetoran()">Lihat Riwayat</button></div></div></div><div class="grid-dua proporsi"><div class="card"><div class="card-header"><div><h3>Input Setoran</h3><p>Nilai 0–100 untuk setiap aspek</p></div></div><form id="form-setoran" onsubmit="prosesSimpanSetoran(event)"><div class="form-grid dua"><label>Tanggal<input name="tanggal" type="date" required></label><label>Materi<select name="id_materi" id="setoran-materi"></select></label><label>Jenis Setoran<select name="jenis_setoran"><option>IQRA</option><option>AL_QURAN</option><option>HAFALAN</option><option>TAJWID</option><option>DOA_HARIAN</option></select></label><label>Status Capaian<select name="status_capaian"><option value="">Otomatis</option><option>LANJUT</option><option>ULANG_SEBAGIAN</option><option>ULANG_PENUH</option><option>PENDAMPINGAN</option></select></label><label>Halaman Mulai<input name="halaman_mulai" type="number" min="0"></label><label>Halaman Selesai<input name="halaman_selesai" type="number" min="0"></label><label>Surat<input name="surat" placeholder="Nama surat"></label><label>Ayat<input name="ayat_selesai" placeholder="Ayat terakhir"></label></div><div class="nilai-grid"><label>Kelancaran<input name="nilai_kelancaran" type="number" min="0" max="100" value="80" required></label><label>Makhraj<input name="nilai_makhraj" type="number" min="0" max="100" value="80" required></label><label>Tajwid<input name="nilai_tajwid" type="number" min="0" max="100" value="80" required></label><label>Hafalan<input name="nilai_hafalan" type="number" min="0" max="100" value="0"></label><label>Adab<input name="nilai_adab" type="number" min="0" max="100" value="85" required></label></div><label>Catatan<textarea name="catatan" rows="3" placeholder="Catatan perkembangan dan tindak lanjut"></textarea></label><button class="btn utama lebar" type="submit">Simpan Setoran</button></form></div><div class="card"><div class="card-header"><h3>Ringkasan Santri</h3></div><div id="ringkasan-setoran" class="empty-state">Pilih santri untuk melihat setoran terakhir dan target aktif.</div><div id="riwayat-setoran" class="list-modern"></div></div></div></section></template>
+
+<template id="tpl-target"><section class="page" data-page="target"><div class="toolbar"><select id="filter-target-status" onchange="muatTarget()"><option value="">Semua status</option><option>BELUM_MULAI</option><option>BERJALAN</option><option>TERCAPAI</option><option>TERTUNDA</option><option>DIBATALKAN</option></select><button class="btn utama" onclick="formTambahTarget()">+ Buat Target</button></div><div class="card"><div id="tabel-target" class="table-wrap"></div></div></section></template>
+
+<template id="tpl-catatan"><section class="page" data-page="catatan"><div class="toolbar"><select id="filter-catatan-kategori" onchange="muatCatatan()"><option value="">Semua kategori</option><option>PERKEMBANGAN</option><option>KEDISIPLINAN</option><option>PENDAMPINGAN</option><option>PRESTASI</option><option>KOMUNIKASI_WALI</option></select><button class="btn utama" onclick="formTambahCatatan()">+ Tambah Catatan</button></div><div id="grid-catatan" class="grid-kartu"></div></section></template>
+
+<template id="tpl-laporan"><section class="page" data-page="laporan"><div class="card"><div class="card-header"><div><h3>Buat Laporan</h3><p>Pilih jenis laporan, objek, dan periode</p></div></div><div class="form-grid empat"><label>Jenis<select id="laporan-jenis" onchange="ubahJenisLaporan()"><option value="SANTRI">Laporan Santri</option><option value="KELAS">Laporan Kelas</option><option value="KEHADIRAN">Rekap Kehadiran</option><option value="SETORAN">Rekap Setoran</option></select></label><label id="wrap-laporan-santri">Santri<select id="laporan-santri"></select></label><label id="wrap-laporan-kelas" class="tersembunyi">Kelas<select id="laporan-kelas"></select></label><label>Tanggal Awal<input id="laporan-awal" type="date"></label><label>Tanggal Akhir<input id="laporan-akhir" type="date"></label></div><div class="aksi-laporan"><button class="btn utama" onclick="pratinjauLaporan()">Tampilkan</button><button class="btn sekunder" onclick="buatPdfLaporan()">Buat PDF</button><button class="btn sekunder" onclick="eksporLaporanCsv()">Ekspor CSV</button></div></div><div class="card laporan-preview"><div id="preview-laporan" class="empty-state">Pilih filter kemudian klik Tampilkan.</div></div></section></template>
+
+<template id="tpl-pengumuman"><section class="page" data-page="pengumuman"><div class="toolbar"><button class="btn utama khusus-admin-pengelola" onclick="formTambahPengumuman()">+ Tambah Pengumuman</button></div><div id="grid-pengumuman" class="grid-kartu"></div></section></template>
+
+<template id="tpl-pengguna"><section class="page" data-page="pengguna"><div class="toolbar"><div class="search-box"><span>⌕</span><input id="cari-pengguna" placeholder="Cari pengguna" oninput="debounceMuatPengguna()"></div><button class="btn utama" onclick="formTambahPengguna()">+ Tambah Pengguna</button></div><div class="card"><div id="tabel-pengguna" class="table-wrap"></div></div></section></template>
+
+<template id="tpl-pengaturan"><section class="page" data-page="pengaturan"><div class="card"><div class="card-header"><div><h3>Pengaturan Aplikasi</h3><p>Profil lembaga, akademik, penilaian, keamanan, dan backup</p></div><button class="btn utama khusus-admin-pengelola" onclick="simpanSemuaPengaturan()">Simpan Perubahan</button></div><div id="form-pengaturan" class="settings-groups"></div></div><div class="card"><div class="card-header"><h3>Keamanan Akun</h3></div><button class="btn sekunder" onclick="formGantiPassword()">Ganti Password Saya</button></div></section></template>
+
+<template id="tpl-audit"><section class="page" data-page="audit"><div class="toolbar"><select id="filter-audit-modul" onchange="muatAudit()"><option value="">Semua modul</option><option>AUTENTIKASI</option><option>SANTRI</option><option>KEHADIRAN</option><option>SETORAN</option><option>KELAS</option><option>PENGATURAN</option><option>BACKUP</option></select></div><div class="card"><div id="tabel-audit" class="table-wrap"></div></div></section></template>
+
+<template id="tpl-backup"><section class="page" data-page="backup"><div class="toolbar"><button class="btn utama" onclick="buatBackupSekarang()">Buat Backup Sekarang</button><button class="btn sekunder" onclick="pasangBackupHarian()">Pasang Backup Harian</button></div><div class="card"><div class="card-header"><h3>Riwayat Backup</h3></div><div id="tabel-backup" class="table-wrap"></div></div></section></template>
+
+<section id="halaman-portal-wali" class="portal-wali tersembunyi"><header class="portal-header"><div class="brand-logo">م</div><div><strong id="portal-nama-lembaga">Monitoring Mengaji</strong><small>Portal Perkembangan Santri</small></div></header><main class="portal-main"><div id="portal-sambutan" class="hero-ringkas"></div><div id="portal-daftar-santri"></div></main><footer>Data ditampilkan khusus untuk wali yang memiliki tautan akses sah.</footer></section>
+
+  </div>
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>
